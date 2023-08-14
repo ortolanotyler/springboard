@@ -1,0 +1,63 @@
+from flask import Flask, request
+import calculations as calc
+
+new_app = Flask(__name__)
+
+@app.route("/calculate/add")
+def addition():
+    """Perform addition on a and b parameters."""
+
+    num_a = int(request.args.get("a"))
+    num_b = int(request.args.get("b"))
+    result = calc.add(num_a, num_b)
+
+    return str(result)
+
+@app.route("/calculate/subtract")
+def subtraction():
+    """Perform subtraction on a and b parameters."""
+
+    num_a = int(request.args.get("a"))
+    num_b = int(request.args.get("b"))
+    result = calc.sub(num_a, num_b)
+
+    return str(result)
+
+@app.route("/calculate/multiply")
+def multiplication():
+    """Perform multiplication on a and b parameters."""
+
+    num_a = int(request.args.get("a"))
+    num_b = int(request.args.get("b"))
+    result = calc.mult(num_a, num_b)
+
+    return str(result)
+
+@app.route("/calculate/divide")
+def division():
+    """Perform division on a and b parameters."""
+
+    num_a = int(request.args.get("a"))
+    num_b = int(request.args.get("b"))
+    result = calc.div(num_a, num_b)
+
+    return str(result)
+
+### SECTION TWO
+
+operations_dict = {
+    "sum": calc.add,
+    "subtract": calc.sub,
+    "product": calc.mult,
+    "ratio": calc.div,
+}
+
+@app.route("/mathematics/<operation>")
+def perform_operation(operation):
+    """Perform specified mathematical operation on a and b."""
+
+    num_a = int(request.args.get("a"))
+    num_b = int(request.args.get("b"))
+    result = operations_dict[operation](num_a, num_b)
+
+    return str(result)
