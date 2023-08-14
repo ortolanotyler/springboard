@@ -1,0 +1,24 @@
+from flask import Flask, render_template, request
+from flask_debugtoolbar import DebugToolbarExtension
+import tales as fable
+
+new_app = Flask(__name__)
+new_app.config['SECRET_KEY'] = "s3cr3t_c0d3"
+
+debug_extension = DebugToolbarExtension(new_app)
+
+@new_app.route("/")
+def gather_info():
+    """Display the form for collecting information."""
+
+    queries = fable.queries
+
+    return render_template("form.html", queries=queries)
+
+@new_app.route("/generate_tale")
+def present_tale():
+    """Show the generated tale based on user inputs."""
+
+    tale_text = fable.compose(request.args)
+
+    return render_template("tale.html", tale_text=tale_text)
