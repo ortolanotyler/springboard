@@ -1,0 +1,44 @@
+"use strict";
+
+const $body = $("body");
+const $loadingMessage = $("#loading-message");
+const $storyList = $("#story-list");
+const $favoriteStories = $("#favorite-stories");
+const $userStories = $("#user-stories");
+const $storyLists = $(".story-lists");
+const $loginForm = $("#login-form");
+const $signupForm = $("#signup-form");
+const $submitForm = $("#submit-form");
+const $navSubmit = $("#nav-submit");
+const $navLogin = $("#nav-login");
+const $navProfile = $("#nav-profile");
+const $navLogout = $("#nav-logout");
+const $userProfile = $("#user-profile");
+
+function hideAllComponents() {
+  const components = [
+    $storyLists,
+    $submitForm,
+    $loginForm,
+    $signupForm,
+    $userProfile
+  ];
+  components.forEach(component => component.hide());
+}
+
+async function initializeApp() {
+  console.debug("Initializing app...");
+
+  await checkRememberedUser();
+  await fetchAndDisplayStories();
+
+  if (currentUser) {
+    updateUIOnUserLogin();
+  }
+}
+
+console.warn("ATTENTION: This code generates multiple debug messages in" +
+  " the console. If you don't see the 'Initializing app...' message below," +
+  " check the console's log level and select 'Verbose'.");
+$(initializeApp);
+
