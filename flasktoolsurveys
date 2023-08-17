@@ -1,0 +1,65 @@
+from flask import Flask, request, render_template, redirect, flash, session
+from flask_debugtoolbar import DebugToolbarExtension
+from surveys import satisfaction_survey as survey
+
+# Constant to store responses in the session
+RESPONSES_KEY = "responses"
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = "confidential-key!"
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
+debug = DebugToolbarExtension(app)
+
+@app.route("/")
+def display_survey_intro():
+    """Present the survey starting point."""
+
+    return render_template("survey_start.html", survey=survey)
+
+@app.route("/initiate", methods=["POST"])
+def initiate_survey():
+    """Reset the session responses and begin the survey."""
+
+    session[RESPONSES_KEY] = []
+
+    return redirect("/questions/0")
+
+@app.route("/answer", methods=["POST"])
+def manage_question():
+    """Save responses and navigate to the next question."""
+
+    choice = request.form['answer']
+    responses = session[RESPONSES_KEY]
+    responses.append(choice)
+    session[RESPONSES_KEY] = responses
+
+    if len(responses) == len(survey.questions):
+        return redirect("/conclusion")
+    else:
+        return redirect(f"/questions/{len(responses)}")
+
+@app.route("/questions/<int:qid>")
+def display_question(qid):
+    """Display the current question."""
+
+    responses = session.get(RESPONSES_KEY)
+
+    if responses is None:
+        return redirect("/")
+
+    if len(responses) == len(survey.questions):
+        return redirect("/conclusion")
+
+    if len(responses) != qid:
+        flash(f"Invalid question id: {qid}.")
+        return redirect(f"/questions/{len(responses)}")
+
+    question = survey.questions[qid]
+    return render_template("question.html", question_num=qid, question=question)
+
+@app.route("/conclusion")
+def show_completion():
+    """Display the survey completion page."""
+
+    return render_template("completion.html")
